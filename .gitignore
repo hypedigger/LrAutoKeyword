@@ -1,0 +1,10 @@
+# vocabulaire personnel (glossaire de tags + export de la liste du catalogue)
+LrAutoKeyword.lrplugin/tag_descriptions.lua
+LrAutoKeyword.lrplugin/tags_annotation.txt
+
+# journaux
+*.log
+
+# outils locaux
+.claude/
+*.lnk
