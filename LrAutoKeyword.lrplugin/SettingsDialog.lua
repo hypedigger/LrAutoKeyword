@@ -12,6 +12,7 @@ local LrProgressScope   = import 'LrProgressScope'
 local VERSION = require 'Version'
 
 local TagManager = require 'TagManager'
+local SupportPrompt = require 'SupportPrompt'
 
 local SettingsDialog = {}
 
@@ -326,6 +327,20 @@ function SettingsDialog.show()
             f:row {
                 spacing = 10,
                 unpack(columnViews),
+            },
+        },
+
+        -- Soutien (Ko-fi)
+        f:row {
+            f:static_text {
+                title = 'Plug-in gratuit et open source. S\'il vous fait gagner du temps :',
+                font  = '<system/small>',
+            },
+            f:push_button {
+                title  = '☕ Soutenir sur Ko-fi',
+                action = function()
+                    SupportPrompt.openKofi()
+                end,
             },
         },
     }

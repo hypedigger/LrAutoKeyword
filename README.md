@@ -43,6 +43,8 @@ If LrAutoKeyword saved you hours of keywording:
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/hypedigger)
 
+The same link is available from the plugin's settings dialog. After the 10th completed Auto-Tag run, and then every 100 runs, the plugin shows a small reminder once the run is over; tick *Ne plus me le demander* to turn it off for good. The run counter stays in Lightroom's local plugin preferences — nothing is sent anywhere.
+
 ## License
 
 [MIT](LICENSE) (except `json.lua`, CC-BY 3.0 as noted above).

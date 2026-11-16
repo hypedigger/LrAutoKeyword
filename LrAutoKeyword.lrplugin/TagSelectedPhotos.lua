@@ -13,6 +13,7 @@ local ClaudeAPI    = require 'ClaudeAPI'
 local ExportHelper = require 'ExportHelper'
 local ReviewDialog = require 'ReviewDialog'
 local Logger       = require 'Logger'
+local SupportPrompt = require 'SupportPrompt'
 
 Logger.clear()
 Logger.info('=== Auto-Tag démarré ===')
@@ -56,6 +57,10 @@ LrTasks.startAsyncTask(function()
     -- When set, these tags are applied to all remaining photos without calling Claude
     local applyToAllTags = nil
 
+    -- Run outcome, used to count a "use" only when everything went through
+    local hadError = false   -- export or API error on at least one photo
+    local aborted  = false   -- "Annuler tout" or progress bar cancelled
+
     local function processPhoto(photo, index)
         if progress:isCanceled() then return false end
 
@@ -75,6 +80,7 @@ LrTasks.startAsyncTask(function()
         local tempPath, exportErr = ExportHelper.exportPhotoToTemp(photo)
         Logger.info('Export result: ' .. tostring(tempPath) .. ' err=' .. tostring(exportErr))
         if not tempPath then
+            hadError = true
             LrDialogs.message(
                 'Erreur export',
                 string.format('Photo %d/%d : %s', index, total, exportErr or 'inconnue'),
@@ -87,6 +93,7 @@ LrTasks.startAsyncTask(function()
         local tagResult, apiErr = ClaudeAPI.analyzeImage(tempPath, activeTags)
 
         if not tagResult then
+            hadError = true
             ExportHelper.cleanup(tempPath)
             LrDialogs.message(
                 'Erreur API Claude',
@@ -122,6 +129,7 @@ LrTasks.startAsyncTask(function()
     for i, photo in ipairs(selectedPhotos) do
         local shouldContinue = processPhoto(photo, i)
         if not shouldContinue then
+            aborted = true
             break
         end
     end
@@ -134,5 +142,11 @@ LrTasks.startAsyncTask(function()
             string.format('%d photo(s) traitée(s).', total),
             'info'
         )
+    end
+
+    -- Count this run and, when due, suggest supporting the plugin.
+    -- Only once the work is done, and never after an error or a cancellation.
+    if not aborted and not hadError and not progress:isCanceled() then
+        SupportPrompt.recordUse()
     end
 end)
